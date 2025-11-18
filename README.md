@@ -252,6 +252,6 @@ Feel free to fork this repo, submit pull requests or open issues.
 
 Pushpa Kumari
 
-👩‍💻 B.Tech (CSE) | Full-Stack Developer
+👩‍💻 B.Tech (CSE-AIDS) | Full-Stack Developer
 
 🔥 Passionate about building clean UI and scalable backend systems.
