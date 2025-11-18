@@ -9,16 +9,16 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
+      const res = await axios.post("http://127.0.0.1:8000/api/token/", {
         username,
         password,
       });
 
-      // ✅ Save tokens in localStorage
+      
       localStorage.setItem("accessToken", res.data.access);
       localStorage.setItem("refreshToken", res.data.refresh);
 
-      // Redirect to dashboard
+      
       window.location.href = "/dashboard";
     } catch (err) {
       console.error(err);

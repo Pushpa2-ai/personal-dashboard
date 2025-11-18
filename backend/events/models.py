@@ -1,21 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Event(models.Model):
-    CATEGORY_CHOICES = [
-        ("personal", "Personal"),
-        ("work", "Work"),
-        ("calendar", "Calendar"),
-        ("task_today", "Task Today"),
-        ("task_weekly", "Task Weekly"),
-        ("notes", "Notes"),
-    ]
-    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # ADD THIS
+
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    date = models.DateField(blank=True, null=True)   # for calendar events
-    completed = models.BooleanField(default=False)   # for tasks
-
+    category = models.CharField(max_length=20)
+    date = models.DateField(blank=True, null=True)
+    completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

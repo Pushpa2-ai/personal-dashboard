@@ -1,43 +1,13 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { ClipboardList, FolderKanban, FileText, CalendarDays } from "lucide-react";
 
-const API_URL = "http://127.0.0.1:8000/api/events/";
+const API_URL = "events/";
 
 const WorkCard = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState("");
-
-  // Fetch work events
-  useEffect(() => {
-    axios.get(API_URL).then((res) => {
-      setEvents(res.data.filter((e) => e.category.startsWith("work-")));
-    });
-  }, []);
-
-  // Add event
-  const addEvent = async () => {
-    if (!newEvent || !activeSection) return;
-    const res = await axios.post(API_URL, {
-      title: newEvent,
-      category: `work-${activeSection}`,
-    });
-    setEvents([res.data, ...events]);
-    setNewEvent("");
-  };
-
-  // Delete event
-  const deleteEvent = async (id) => {
-    await axios.delete(`${API_URL}${id}/`);
-    setEvents(events.filter((e) => e.id !== id));
-  };
-
-  // Edit event
-  const editEvent = async (id, newTitle) => {
-    const res = await axios.put(`${API_URL}${id}/`, { title: newTitle, category: `work-${activeSection}` });
-    setEvents(events.map((e) => (e.id === id ? res.data : e)));
-  };
 
   const sections = [
     { key: "tasks", label: "Tasks", icon: <ClipboardList size={28} /> },
@@ -46,6 +16,61 @@ const WorkCard = () => {
     { key: "meetings", label: "Meetings", icon: <CalendarDays size={28} /> },
   ];
 
+  // Fetch work events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await api.get(API_URL);
+        setEvents(res.data.filter((e) => e.category.startsWith("work-")));
+      } catch (error) {
+        console.error("Error fetching work events:", error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // Add work event
+  const addEvent = async () => {
+    if (!newEvent.trim() || !activeSection) return;
+
+    try {
+      const res = await api.post(API_URL, {
+        title: newEvent,
+        category: `work-${activeSection}`,
+      });
+
+      setEvents([res.data, ...events]);
+      setNewEvent("");
+    } catch (error) {
+      console.error("Error adding work event:", error);
+    }
+  };
+
+  // Delete work event
+  const deleteEvent = async (id) => {
+    try {
+      await api.delete(`${API_URL}${id}/`);
+      setEvents(events.filter((e) => e.id !== id));
+    } catch (error) {
+      console.error("Error deleting work event:", error);
+    }
+  };
+
+  // Edit work event
+  const editEvent = async (id, newTitle) => {
+    try {
+      const updated = await api.put(`${API_URL}${id}/`, {
+        title: newTitle,
+        category: `work-${activeSection}`,
+      });
+
+      setEvents(events.map((e) => (e.id === id ? updated.data : e)));
+    } catch (error) {
+      console.error("Error editing work event:", error);
+    }
+  };
+
   return (
     <div className="bg-white p-4 rounded-2xl shadow-md">
       {/* Header */}
@@ -53,13 +78,13 @@ const WorkCard = () => {
         Work
       </div>
 
-      {/* Icons */}
+      {/* Icon buttons */}
       <div className="grid grid-cols-4 gap-4 justify-items-center py-4">
         {sections.map((section) => (
           <button
             key={section.key}
             onClick={() => setActiveSection(section.key)}
-            className={`flex flex-col items-center transform transition-transform hover:scale-125 ${
+            className={`flex flex-col items-center transition-transform hover:scale-125 ${
               activeSection === section.key ? "text-purple-600" : "text-gray-600"
             }`}
           >
@@ -69,11 +94,12 @@ const WorkCard = () => {
         ))}
       </div>
 
-      {/* Event Section */}
+      {/* Events list */}
       {activeSection && (
         <div className="mt-4">
-          <h3 className="font-semibold">Work {activeSection}</h3>
-          <ul className="mt-2">
+          <h3 className="font-semibold capitalize">Work {activeSection}</h3>
+
+          <ul className="mt-2 max-h-32 overflow-auto">
             {events
               .filter((e) => e.category === `work-${activeSection}`)
               .map((event) => (
@@ -103,8 +129,8 @@ const WorkCard = () => {
               type="text"
               value={newEvent}
               onChange={(e) => setNewEvent(e.target.value)}
-              className="flex-grow border p-2 rounded-lg"
               placeholder={`Add new ${activeSection}...`}
+              className="flex-grow border p-2 rounded-lg"
             />
             <button
               onClick={addEvent}

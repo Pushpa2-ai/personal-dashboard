@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api"; // <-- important (Uses JWT token)
 
-const API_URL = "http://127.0.0.1:8000/api/notes/";
+const API_URL = "events/"; // Because api.js already has baseURL
 
 const NotesCard = () => {
   const [notes, setNotes] = useState([]);
@@ -9,45 +9,73 @@ const NotesCard = () => {
 
   // Fetch notes
   useEffect(() => {
-    axios.get(API_URL).then((res) => setNotes(res.data));
+    const fetchNotes = async () => {
+      try {
+        const res = await api.get(API_URL);
+        // Filter only category = "note"
+        setNotes(res.data.filter((item) => item.category === "note"));
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      }
+    };
+
+    fetchNotes();
   }, []);
 
   // Add note
   const addNote = async () => {
-    if (!newNote) return;
-    const res = await axios.post(API_URL, { content: newNote });
-    setNotes([res.data, ...notes]);
-    setNewNote("");
+    if (!newNote.trim()) return;
+
+    try {
+      const res = await api.post(API_URL, {
+        title: newNote,
+        category: "note",
+      });
+
+      setNotes([res.data, ...notes]);
+      setNewNote("");
+    } catch (error) {
+      console.error("Error adding note:", error);
+    }
   };
 
   // Delete note
   const deleteNote = async (id) => {
-    await axios.delete(`${API_URL}${id}/`);
-    setNotes(notes.filter((n) => n.id !== id));
+    try {
+      await api.delete(`${API_URL}${id}/`);
+      setNotes(notes.filter((n) => n.id !== id));
+    } catch (error) {
+      console.error("Error deleting note:", error);
+    }
   };
 
   // Edit note
   const editNote = async (id, newContent) => {
-    const res = await axios.put(`${API_URL}${id}/`, { content: newContent });
-    setNotes(notes.map((n) => (n.id === id ? res.data : n)));
+    try {
+      const res = await api.put(`${API_URL}${id}/`, {
+        title: newContent,
+        category: "note",
+      });
+      setNotes(notes.map((n) => (n.id === id ? res.data : n)));
+    } catch (error) {
+      console.error("Error editing note:", error);
+    }
   };
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-6 border border-gray-200 h-56">
-      {/* Header */}
       <div className="bg-[#c8acc8] text-black p-2 rounded-t-2xl text-center font-bold">
         Notes
       </div>
 
-      {/* Notes List */}
-      <ul className="mt-2">
+      <ul className="mt-2 overflow-y-auto max-h-32">
         {notes.map((note) => (
           <li
             key={note.id}
             className="flex justify-between items-center bg-gray-100 p-2 rounded-lg my-1"
           >
             <textarea
-              defaultValue={note.content}
+              defaultValue={note.title}
               onBlur={(e) => editNote(note.id, e.target.value)}
               className="bg-transparent flex-grow outline-none resize-none"
             />
@@ -61,7 +89,6 @@ const NotesCard = () => {
         ))}
       </ul>
 
-      {/* Add Note */}
       <div className="flex mt-2">
         <input
           type="text"

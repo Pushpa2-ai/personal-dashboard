@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 
-const API_URL = "http://127.0.0.1:8000/api/events/";
+const API_URL = "events/";
 
 const CalendarCard = () => {
   const today = new Date();
@@ -12,61 +12,98 @@ const CalendarCard = () => {
   const [newEvent, setNewEvent] = useState("");
 
   const monthNames = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
 
-  // Fetch events
+  // Fetch calendar events
   useEffect(() => {
-    axios.get(API_URL).then((res) => {
-      setEvents(res.data.filter((e) => e.category === "calendar"));
-    });
+    const fetchEvents = async () => {
+      try {
+        const res = await api.get(API_URL);
+        setEvents(res.data.filter((e) => e.category === "calendar"));
+      } catch (error) {
+        console.error("Calendar fetch error:", error);
+      }
+    };
+    fetchEvents();
   }, []);
 
   // Add event
   const addEvent = async () => {
-    if (!newEvent || !selectedDate) return;
-    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(selectedDate).padStart(2, "0")}`;
-    const res = await axios.post(API_URL, {
-      title: newEvent,
-      category: "calendar",
-      date: dateStr,
-    });
-    setEvents([res.data, ...events]);
-    setNewEvent("");
+    if (!newEvent.trim() || !selectedDate) return;
+
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(
+      2,
+      "0"
+    )}-${String(selectedDate).padStart(2, "0")}`;
+
+    try {
+      const res = await api.post(API_URL, {
+        title: newEvent,
+        category: "calendar",
+        date: dateStr,
+      });
+
+      setEvents([res.data, ...events]);
+      setNewEvent("");
+    } catch (error) {
+      console.error("Add event error:", error);
+    }
   };
 
   // Delete event
   const deleteEvent = async (id) => {
-    await axios.delete(`${API_URL}${id}/`);
-    setEvents(events.filter((e) => e.id !== id));
+    try {
+      await api.delete(`${API_URL}${id}/`);
+      setEvents(events.filter((e) => e.id !== id));
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
   };
 
-  // Days in current month
+  // Edit event title
+  const editEvent = async (id, newTitle) => {
+    try {
+      const updated = await api.put(`${API_URL}${id}/`, {
+        title: newTitle,
+        category: "calendar",
+        date: events.find((e) => e.id === id).date,
+      });
+
+      setEvents(events.map((e) => (e.id === id ? updated.data : e)));
+    } catch (error) {
+      console.error("Edit event error:", error);
+    }
+  };
+
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-  // Prev / Next month
   const changeMonth = (offset) => {
-    let newMonth = currentMonth + offset;
-    let newYear = currentYear;
-    if (newMonth < 0) {
-      newMonth = 11;
-      newYear--;
-    } else if (newMonth > 11) {
-      newMonth = 0;
-      newYear++;
+    let m = currentMonth + offset;
+    let y = currentYear;
+
+    if (m < 0) {
+      m = 11;
+      y--;
+    } else if (m > 11) {
+      m = 0;
+      y++;
     }
-    setCurrentMonth(newMonth);
-    setCurrentYear(newYear);
+
+    setCurrentMonth(m);
+    setCurrentYear(y);
     setSelectedDate(null);
   };
 
   return (
     <div className="bg-white p-4 rounded-2xl shadow-md">
-      {/* Header with month + navigation */}
+      {/* Header */}
       <div className="flex justify-between items-center bg-[#c8acc8] text-black p-2 rounded-t-2xl">
         <button onClick={() => changeMonth(-1)}>◀</button>
-        <h2 className="font-bold">{monthNames[currentMonth]} {currentYear}</h2>
+        <h2 className="font-bold">
+          {monthNames[currentMonth]} {currentYear}
+        </h2>
         <button onClick={() => changeMonth(1)}>▶</button>
       </div>
 
@@ -74,14 +111,18 @@ const CalendarCard = () => {
       <div className="grid grid-cols-7 gap-2 mt-4">
         {[...Array(daysInMonth)].map((_, i) => {
           const day = i + 1;
-          const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(
+            2,
+            "0"
+          )}-${String(day).padStart(2, "0")}`;
+
           const hasEvent = events.some((e) => e.date === dateStr);
 
           return (
             <button
               key={day}
               onClick={() => setSelectedDate(day)}
-              className={`p-2 rounded-lg ${
+              className={`p-2 rounded-lg transition ${
                 selectedDate === day ? "bg-purple-300" : "bg-gray-100"
               } ${hasEvent ? "border-2 border-purple-600" : ""}`}
             >
@@ -91,7 +132,7 @@ const CalendarCard = () => {
         })}
       </div>
 
-      {/* Event section */}
+      {/* Events list & Add form */}
       {selectedDate && (
         <div className="mt-4">
           <h3 className="font-semibold">
@@ -103,17 +144,25 @@ const CalendarCard = () => {
               .filter(
                 (e) =>
                   e.date ===
-                  `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(selectedDate).padStart(2, "0")}`
+                  `${currentYear}-${String(currentMonth + 1).padStart(
+                    2,
+                    "0"
+                  )}-${String(selectedDate).padStart(2, "0")}`
               )
               .map((event) => (
                 <li
                   key={event.id}
-                  className="flex justify-between bg-gray-100 p-2 rounded-lg my-1"
+                  className="flex justify-between items-center bg-gray-100 p-2 rounded-lg my-1"
                 >
-                  {event.title}
+                  <input
+                    type="text"
+                    defaultValue={event.title}
+                    className="bg-transparent flex-grow outline-none"
+                    onBlur={(e) => editEvent(event.id, e.target.value)}
+                  />
                   <button
-                    className="text-red-500"
                     onClick={() => deleteEvent(event.id)}
+                    className="text-red-500 ml-2"
                   >
                     ✕
                   </button>
@@ -121,13 +170,14 @@ const CalendarCard = () => {
               ))}
           </ul>
 
+          {/* Add new event */}
           <div className="flex mt-2">
             <input
               type="text"
               value={newEvent}
               onChange={(e) => setNewEvent(e.target.value)}
               className="flex-grow border p-2 rounded-lg"
-              placeholder="New event..."
+              placeholder="Add new event..."
             />
             <button
               onClick={addEvent}

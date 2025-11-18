@@ -11,7 +11,7 @@ function QuoteWidget() {
   ];
 
   useEffect(() => {
-    fetch("https://api.quotable.io/random")
+    fetch("http://api.quotable.io/random")
       .then((res) => {
         if (!res.ok) throw new Error("API error");
         return res.json();
