@@ -1,4 +1,6 @@
 🌟 My-Dashboard — Personal & Work Productivity Manager
+<p align="center"> <img src="frontend/src/assets/demo.gif" width="800" /> </p>
+
 
 A modern, responsive, AI-assisted Productivity Dashboard built using
 React (frontend) and Django REST Framework (backend).
