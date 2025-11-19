@@ -117,17 +117,17 @@ Unauthorized requests are handled gracefully
 
 Endpoint	Method	Description
 
-/api/events/	GET	Fetch all events of logged-in user
+/api/events/	 GET	 Fetch all events of logged-in user
 
-/api/events/	POST	Create new event / task / note
+/api/events/	 POST	 Create new event / task / note
 
-/api/events/<id>/	PUT	Update event
+/api/events/<id>/	 PUT	 Update event
 
-/api/events/<id>/	DELETE	Delete event
+/api/events/<id>/	 DELETE 	Delete event
 
-/api/token/	POST	Login & get JWT
+/api/token/ 	POST	 Login & get JWT
 
-/api/token/refresh/	POST	Refresh token
+/api/token/refresh/	 POST	 Refresh token
 
 📦 Key Features (Detailed)
 
