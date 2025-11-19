@@ -3,6 +3,8 @@
 ############################
 
 # Byte-compiled / optimized / DLL files
+node_modules/
+*.cache
 __pycache__/
 *.py[cod]
 *$py.class
