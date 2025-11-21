@@ -3,7 +3,7 @@
 <p align="center"> <img src="frontend/src/assets/demo.gif" width="800" /> </p>
 
 
-A modern, responsive, AI-assisted Productivity Dashboard built using
+A modern, responsive dashboard built using
 React (frontend) and Django REST Framework (backend).
 It centralizes all your personal tasks, work tasks, goals, journals, notes, meetings, reports, projects, and calendar events — all in one organized place.
 
@@ -31,9 +31,9 @@ This project streamlines daily productivity with a clean UI, secure user authent
 
 ✔ Smooth & clean UI built using TailwindCSS
 
-🎯 Why This Project Is Valuable (Recruiter Perspective)
+🎯 Why This Project Is Valuable 
 
-This project demonstrates your skill in:
+This project demonstrates my skill in:
 
 💡 Full-stack development (React + Django REST)
 
@@ -75,11 +75,29 @@ Django REST Framework
 
 Simple JWT Authentication
 
-SQLite / PostgreSQL
+SQLite
 
 Django Filters
 
 CORS Headers
+
+📌 Project Architecture
+personal-dashboard/
+│
+├── backend/               # Django REST API
+│   ├── events/            # Notes, tasks, calendar events model + API
+│   ├── users/             # Auth + JWT
+│   ├── settings.py
+│   └── urls.py
+│
+└── frontend/              # React UI
+    ├── src/
+    │   ├── components/    # Dashboard cards & widgets
+    │   ├── pages/         # Login, Register, Dashboard
+    │   ├── api/           # Axios API services
+    │   └── hooks/
+    └── public/
+    
 
 🔐 Authentication Flow
 
@@ -94,6 +112,22 @@ All API calls automatically include the JWT token
 Token refresh system auto-generates new access tokens
 
 Unauthorized requests are handled gracefully
+
+📝 API Endpoints (Backend) 
+
+Endpoint	Method	Description
+
+/api/events/	 GET	 Fetch all events of logged-in user
+
+/api/events/	 POST	 Create new event / task / note
+
+/api/events/<id>/	 PUT	 Update event
+
+/api/events/<id>/	 DELETE 	Delete event
+
+/api/token/ 	POST	 Login & get JWT
+
+/api/token/refresh/	 POST	 Refresh token
 
 📦 Key Features (Detailed)
 
@@ -125,12 +159,9 @@ Work Meetings
 
 Each supports:
 
-Add
-
-Edit
-
-Delete
-
+Add,
+Edit,
+Delete,
 Auto-refresh
 
 🔸 3. Notes
@@ -155,7 +186,8 @@ Delete events
 
 Highlights dates with events
 
-🔸 5. Widgets
+🔸 5. Widgets 
+
 🌤 Weather Widget
 
 Real-time weather API
