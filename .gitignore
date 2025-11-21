@@ -1,0 +1,67 @@
+############################
+# PYTHON / DJANGO
+############################
+
+backend/myenv/
+backend/db.sqlite3
+frontend/node_modules/
+frontend/build/
+
+
+# Byte-compiled / optimized / DLL files
+node_modules/
+*.cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+.pyenv/
+
+# Django stuff
+*.log
+*.pot
+*.pyc
+media/
+staticfiles/
+static/
+db.sqlite3
+db.sqlite3-journal
+
+# Local configs
+*.env
+.env.local
+.env.*.local
+
+############################
+# REACT / NODE
+############################
+
+# Node modules
+frontend/node_modules/
+frontend/.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+frontend/build/
+frontend/dist/
+frontend/.parcel-cache/
+
+############################
+# EDITOR / OS FILES
+############################
+
+# VSCode
+.vscode/
+.history/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
