@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <div className="bg-[#c5b4c5] bg-repeat text-center py-16 relative">
       <Home className="absolute left-8 top-8 w-10 h-10 text-gray-700" />
-      <h1 className="text-5xl font-serif tracking-widest text-gray-900">𝑊𝑒𝑙𝑐𝑜𝑚𝑒 𝑃𝑢𝑠ℎ𝑝𝑎</h1>
+      <h1 className="text-5xl font-serif tracking-widest text-gray-900">𝑊𝑒𝑙𝑐𝑜𝑚𝑒 Back</h1>
     </div>
   );
 }
