@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [
     'personal-dashboard-ppct.onrender.com',
     'localhost',
     '127.0.0.1',
+    'personal-dashboard-six-delta.vercel.app',
 ]
 
 
@@ -64,6 +65,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite
     "http://localhost:3000",  # CRA/Next dev
+    "https://personal-dashboard-six-delta.vercel.app",
 ]
 
 REST_FRAMEWORK = {
